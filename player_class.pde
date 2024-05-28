@@ -99,6 +99,7 @@ class Player extends CollidableObject {
             if(player.interact){
               plantyFloor.setDefaultSprite(plantySeedImage);
               plantyFloor.setState("Com Semente");
+              inventory.removeItem("Semente de Tomate");
               this.interact = false;
             }
         }else if(plantyState.equals("Com Semente")){
@@ -106,6 +107,7 @@ class Player extends CollidableObject {
             if(player.interact){
                plantyFloor.setDefaultSprite(plantySeedWetImage);
                plantyFloor.setState("Com Semente e Molhado");
+               inventory.removeItem("Água");
                this.interact = false;
             }
         }else if(plantyState.equals("Com Semente e Molhado")){

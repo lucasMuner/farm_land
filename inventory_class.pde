@@ -25,9 +25,26 @@ class Inventory {
     // Se não houver um item semelhante, adicionamos o novo item ao inventário
     items.add(newItem);
 }
+
+     void removeItem(String itemName) {
+        for (InventoryItem item : items) {
+          if (item.getName().equals(itemName)) {
+            if(item.getQuantity() > 1){
+               item.decreaseQuantity();
+            }else{
+              items.remove(item);
+            }
+            return;
+        }
+        }
+    }
     
-     void removeItem(InventoryItem item) {
+     void remove(InventoryItem item) {
         items.remove(item);
+    }
+    
+    void removeQtd(InventoryItem item) {
+        item.decreaseQuantity();
     }
 
     void display() {

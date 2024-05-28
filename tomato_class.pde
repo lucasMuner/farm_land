@@ -14,6 +14,8 @@ class Tomato extends CollidableObject{
     getCollisionMask().updatePosition(x, y);
   }
   
+  
+  
   void display() {
     image(img, x, y, w, h);
     getCollisionMask().display();

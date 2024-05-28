@@ -23,6 +23,14 @@ class InventoryItem {
       this.quantity++;
     }
     
+    void decreaseQuantity(){
+      this.quantity--;
+    }
+    
+    String getName(){
+      return this.name;
+    }
+    
      boolean equals(InventoryItem other) {
         // Verifica se as imagens dos itens são iguais
         return this.image == other.getImage();

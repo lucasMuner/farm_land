@@ -19,7 +19,7 @@ PImage floorImage;
 int wallSize = 32; 
 int scale = 2;
 int playerSize = 32;
-int speed = 5;
+int speed = 10;
 int scaleLayout = 40; // Escala do layout
 int rows = 16; // Número de linhas no layoutds
 int cols = 20; 
@@ -178,8 +178,8 @@ void updateCamera() {
     // Restringe a posição da câmera dentro dos limites do mapa
     cameraX = constrain(cameraX, minCameraX, maxCameraX);
     cameraY = constrain(cameraY, minCameraY, maxCameraY);
-    inventory.displayX = cameraX + width/4;
-    inventory.displayY =cameraY - 100;
+    inventory.displayX = cameraX + width/4 + 25;
+    inventory.displayY =cameraY - 75;
   }
   
   // Aplica a translação da câmera

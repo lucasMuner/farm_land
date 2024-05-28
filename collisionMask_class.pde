@@ -30,7 +30,7 @@ class CollisionMask {
   // Desenha a máscara de colisão (para depuração)
   void display() {
     noFill();
-    stroke(255, 0, 0); // Cor vermelha
+    noStroke();
     rect(x, y, w, h);
   }
 }

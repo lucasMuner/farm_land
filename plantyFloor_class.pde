@@ -1,7 +1,9 @@
 class PlantyFloor extends CollidableObject{
   float x, y, w, h;
   PImage[] growthSprites;
-   PImage[] growthSpritesCarrot;
+  PImage[] growthSpritesCarrot;
+  PImage[] growthSpritesPlum;
+  PImage[] growthSpritesCanabis;
   PImage defaultSprite;
   PImage spriteSheet = loadImage("spritesheet.png");
   PImage defaultImageNotGrowing = spriteSheet.get(224, 32, 32, 32);
@@ -13,7 +15,7 @@ class PlantyFloor extends CollidableObject{
   boolean isColliding = false;
   String plantyName = "Tomate";
 
-  PlantyFloor(float x, float y, float w, float h, PImage defaultSprite, PImage[] growthSprites, PImage[] growthSpritesCarrot) {
+  PlantyFloor(float x, float y, float w, float h, PImage defaultSprite, PImage[] growthSprites, PImage[] growthSpritesCarrot,PImage[] growthSpritesPlum,PImage[] growthSpritesCanabis) {
      super(new CollisionMask(0, 0, 32, 32, 32, 32));
     this.x = x;
     this.y = y;
@@ -22,6 +24,8 @@ class PlantyFloor extends CollidableObject{
     this.defaultSprite = defaultSprite;
     this.growthSprites = growthSprites;
     this.growthSpritesCarrot = growthSpritesCarrot;
+    this.growthSpritesPlum = growthSpritesPlum;
+    this.growthSpritesCanabis = growthSpritesCanabis;
     this.totalStages = growthSprites.length;
     this.currentStage = 0;
     this.lastUpdateTime = millis();
@@ -105,6 +109,20 @@ class PlantyFloor extends CollidableObject{
         if(state == "Pronto Para Coletar Cenoura"){
           defaultSprite = defaultImageNotGrowing;
         }
+    }else if(this.plantyName.equals("Ameixa")){
+     this.currentStage = 0;
+        this.state = "Pronto Para Coletar Ameixa"; 
+        this.isGrowing = false;
+        if(state == "Pronto Para Coletar Ameixa"){
+          defaultSprite = defaultImageNotGrowing;
+        }
+    }else if(this.plantyName.equals("Canabis")){
+     this.currentStage = 0;
+        this.state = "Pronto Para Coletar Canabis"; 
+        this.isGrowing = false;
+        if(state == "Pronto Para Coletar Canabis"){
+          defaultSprite = defaultImageNotGrowing;
+        }
     }
     }
 
@@ -126,6 +144,18 @@ class PlantyFloor extends CollidableObject{
     } else {
       image(defaultSprite, x, y, w, h);
     }
+  }else if(this.plantyName.equals("Ameixa")){
+  if (isGrowing) {
+      image(growthSpritesPlum[currentStage], x, y, w, h);
+    } else {
+      image(defaultSprite, x, y, w, h);
+    }
+  }else if(this.plantyName.equals("Canabis")){
+  if (isGrowing) {
+      image(growthSpritesCanabis[currentStage], x, y, w, h);
+    } else {
+      image(defaultSprite, x, y, w, h);
+    }
   }
   }
-}
+  }

@@ -145,6 +145,8 @@ class Shop {
         ArrayList<String> itemNamesToSell = new ArrayList<>();
         itemNamesToSell.add("Tomate");
         itemNamesToSell.add("Cenoura");
+        itemNamesToSell.add("Ameixa");
+        itemNamesToSell.add("Canabis");
          ArrayList<InventoryItem> itemsToRemove = new ArrayList<>();
     for (InventoryItem item : inventory.items) {
         if (itemNamesToSell.contains(item.getName())) {

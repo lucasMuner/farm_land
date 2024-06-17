@@ -1,4 +1,5 @@
 class Player extends CollidableObject {
+    boolean moving = false;
     float x, y, size, speed;
     PImage seedImage;
     PImage waterImage;
@@ -18,6 +19,20 @@ class Player extends CollidableObject {
     PImage carrotSeedWetInteractyImage;
     PImage carrotCollect;
     PImage carrotCollectInteract;
+    PImage plumImage;
+    PImage plumSeedImage;
+    PImage plumSeedInteractyImage;
+    PImage plumSeedWetImage;
+    PImage plumSeedWetInteractyImage;
+    PImage plumCollect;
+    PImage plumCollectInteract;
+    PImage canabisImage;
+    PImage canabisSeedImage;
+    PImage canabisSeedInteractyImage;
+    PImage canabisSeedWetImage;
+    PImage canabisSeedWetInteractyImage;
+    PImage canabisCollect;
+    PImage canabisCollectInteract;
     PImage[] walkRightFrames;
     PImage[] walkLeftFrames;
     PImage[] walkDownFrames;
@@ -81,6 +96,22 @@ class Player extends CollidableObject {
         carrotSeedWetInteractyImage = spriteAnimate.get(512, 96, 32, 32);
         carrotCollect = spriteAnimate.get(672,64, 32, 32);
         carrotCollectInteract = spriteAnimate.get(544, 96, 32, 32);
+        
+        plumImage = spriteAnimate.get(544, 32, 32, 32);
+        plumSeedImage = spriteAnimate.get(512, 128, 32, 32);
+        plumSeedInteractyImage = spriteAnimate.get(512, 160, 32, 32);
+        plumSeedWetImage = spriteAnimate.get(544, 128, 32, 32);
+        plumSeedWetInteractyImage = spriteAnimate.get(544, 160, 32, 32);
+        plumCollect = spriteAnimate.get(672,128, 32, 32);
+        plumCollectInteract = spriteAnimate.get(544, 160, 32, 32);
+        
+        canabisImage = spriteAnimate.get(576, 32, 32, 32);
+        canabisSeedImage = spriteAnimate.get(512, 192, 32, 32);
+        canabisSeedInteractyImage = spriteAnimate.get(512, 224, 32, 32);
+        canabisSeedWetImage = spriteAnimate.get(544, 192, 32, 32);
+        canabisSeedWetInteractyImage = spriteAnimate.get(544, 224, 32, 32);
+        canabisCollect = spriteAnimate.get(672,192, 32, 32);
+        canabisCollectInteract = spriteAnimate.get(544, 224, 32, 32);
 
         for (int i = 0; i < frameCount; i++) {
             walkRightFrames[i] = spriteAnimate.get(i * 32, 64, 32, 32);
@@ -136,6 +167,21 @@ class Player extends CollidableObject {
               this.interact = false;
             }
            }
+           else if(inventory.getSelectedItemName().equals("Semente de Ameixa")){
+                if(player.interact && inventory.getItemQuantity("Semente de Ameixa") > 0){
+              plantyFloor.setDefaultSprite(plumSeedImage);
+              plantyFloor.setState("Com Semente de Ameixa");
+              inventory.removeItem("Semente de Ameixa");
+              this.interact = false;
+            }
+           }else if(inventory.getSelectedItemName().equals("Semente de Canabis")){
+                if(player.interact && inventory.getItemQuantity("Semente de Canabis") > 0){
+              plantyFloor.setDefaultSprite(canabisSeedImage);
+              plantyFloor.setState("Com Semente de Canabis");
+              inventory.removeItem("Semente de Canabis");
+              this.interact = false;
+            }
+           }
         }else if(plantyState.equals("Com Semente")){
             plantyFloor.setDefaultSprite(plantySeedInteractyImage);
             plantyFloor.setPlantyName("Tomate");
@@ -176,6 +222,46 @@ class Player extends CollidableObject {
                plantyFloor.setState("Vazio");
                collectCarrot();
             }
+        }else if(plantyState.equals("Com Semente de Ameixa")){
+            plantyFloor.setDefaultSprite(plumSeedInteractyImage);
+            plantyFloor.setPlantyName("Ameixa");
+            if(player.interact && inventory.getItemQuantity("Água") > 0){
+               plantyFloor.setDefaultSprite(plumSeedWetImage);
+               plantyFloor.setState("Com Semente de Ameixa e Molhado");
+               inventory.removeItem("Água");
+               this.interact = false;
+            }
+        }else if(plantyState.equals("Com Semente de Ameixa e Molhado")){
+               plantyFloor.setIsGrowing(true);
+               this.interact = false;
+        }else if(plantyState.equals("Pronto Para Coletar Ameixa")){
+               plantyFloor.setDefaultSprite(plumCollectInteract);
+            if(player.interact){
+               plantyFloor.setDefaultSprite(plantyEmptyImage);
+               this.interact = false;
+               plantyFloor.setState("Vazio");
+               collectPlum();
+            }
+        }else if(plantyState.equals("Com Semente de Canabis")){
+            plantyFloor.setDefaultSprite(canabisSeedInteractyImage);
+            plantyFloor.setPlantyName("Canabis");
+            if(player.interact && inventory.getItemQuantity("Água") > 0){
+               plantyFloor.setDefaultSprite(canabisSeedWetImage);
+               plantyFloor.setState("Com Semente de Canabis e Molhado");
+               inventory.removeItem("Água");
+               this.interact = false;
+            }
+        }else if(plantyState.equals("Com Semente de Canabis e Molhado")){
+               plantyFloor.setIsGrowing(true);
+               this.interact = false;
+        }else if(plantyState.equals("Pronto Para Coletar Canabis")){
+               plantyFloor.setDefaultSprite(canabisCollectInteract);
+            if(player.interact){
+               plantyFloor.setDefaultSprite(plantyEmptyImage);
+               this.interact = false;
+               plantyFloor.setState("Vazio");
+               collectCanabis();
+            }
         }
         playerIsCollidingWithPlanty = plantyFloor.getIsColliding();
     } else {
@@ -203,6 +289,18 @@ class Player extends CollidableObject {
                plantyFloor.setDefaultSprite(plantySeedImage);
             }else if(plantyState.equals("Pronto Para Coletar")){
                plantyFloor.setDefaultSprite(plantyCollect);
+            }else if(plantyState.equals("Com Semente de Cenoura")){
+               plantyFloor.setDefaultSprite(carrotSeedImage);
+            }else if(plantyState.equals("Pronto Para Coletar Cenoura")){
+               plantyFloor.setDefaultSprite(carrotCollect);
+            }else if(plantyState.equals("Com Semente de Ameixa")){
+               plantyFloor.setDefaultSprite(plumSeedImage);
+            }else if(plantyState.equals("Pronto Para Coletar Ameixa")){
+               plantyFloor.setDefaultSprite(plumCollect);
+            }else if(plantyState.equals("Com Semente de Canabis")){
+               plantyFloor.setDefaultSprite(canabisSeedImage);
+            }else if(plantyState.equals("Pronto Para Coletar Canabis")){
+               plantyFloor.setDefaultSprite(canabisCollect);
             }
             plantyFloor.setIsColliding(false); // Define como não colidindo
         }
@@ -391,27 +489,40 @@ class Player extends CollidableObject {
         }
     }
 
-    void keyPressed() {
-        if (key == 'w') up = true;
-        if (key == 's') down = true;
-        if (key == 'a') left = true;
-        if (key == 'd') right = true;
-        if (key == 'e') interact = true;
-        else if (key == ESC) {
-            if (shop.isVisible) {
-                shop.hide();
-                key = 0; // Previne que a tela de pause padrão apareça
-            }
+void keyPressed() {
+    if (key == 'w') up = true;
+    if (key == 's') down = true;
+    if (key == 'a') left = true;
+    if (key == 'd') right = true;
+    if (key == 'e') interact = true;
+    else if (key == ESC) {
+        if (shop.isVisible) {
+            shop.hide();
+            key = 0; // Previne que a tela de pause padrão apareça
         }
     }
 
-    void keyReleased() {
-        if (key == 'w') up = false;
-        if (key == 's') down = false;
-        if (key == 'a') left = false;
-        if (key == 'd') right = false;
-        if (key == 'e') interact = false;
+    checkMoving();
+}
+
+void keyReleased() {
+    if (key == 'w') up = false;
+    if (key == 's') down = false;
+    if (key == 'a') left = false;
+    if (key == 'd') right = false;
+    if (key == 'e') interact = false;
+
+    checkMoving();
+}
+
+void checkMoving() {
+    if (up || down || left || right) {
+        moving = true;
+    } else {
+        moving = false;
     }
+}
+
         void mousePressed() {
         if (shop.isVisible) {
             shop.checkMouseClick(mouseX + cameraX, mouseY + cameraY);
@@ -444,6 +555,16 @@ class Player extends CollidableObject {
     inventory.addItem(carrot);
     }
     
+    void collectPlum() {
+    InventoryItem plum = new InventoryItem("Ameixa", 1, 500, plumImage);
+    inventory.addItem(plum);
+    }
+    
+    void collectCanabis() {
+    InventoryItem canabis = new InventoryItem("Canabis", 1, 1000, canabisImage);
+    inventory.addItem(canabis);
+    }
+    
    void setInteract(boolean value){
        this.interact = value;
    }
@@ -458,6 +579,10 @@ class Player extends CollidableObject {
     int getMoney() {
         return money;
     }
+    
+    boolean isMoving() {
+    return moving;
+   }
    
-   
+
 }

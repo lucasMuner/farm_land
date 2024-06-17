@@ -1,6 +1,10 @@
+import processing.sound.*;
+
 Player player;
 Inventory inventory;
 Shop shop;
+boolean gameWon = false;
+boolean isMoving = false;
 PImage spriteSheet;
 PImage wallImage;
 PImage wallDownImage;
@@ -15,18 +19,20 @@ PImage shopBackground;
 PImage moneyIcon;
 PImage[] plantyFloorGrowing = new PImage[6];
 PImage[] carrotFloorGrowing = new PImage[6];
+PImage[] plumFloorGrowing = new PImage[6];
+PImage[] canabisFloorGrowing = new PImage[6];
 PImage[] pitsAnimate = new PImage[3];
 PImage[] npcStoreImages = new PImage[2];
-PImage[] npcStoreAnimate= new PImage[4];
+PImage[] npcStoreAnimate = new PImage[4];
 PImage playerImage;
 PImage layoutImage;
 PImage floorImage;
 int wallSize = 32; 
 int scale = 2;
 int playerSize = 32;
-int speed = 5;
+int speed = 3;
 int scaleLayout = 40; // Escala do layout
-int rows = 16; // Número de linhas no layoutds
+int rows = 16; // Número de linhas no layout
 int cols = 20; 
 float cameraX, cameraY;
 PImage buttonBackground;
@@ -45,6 +51,8 @@ ArrayList<Pit> pits;
 ArrayList<Seed> seeds;
 ArrayList<Tomato> tomatos;
 
+SoundFile music;
+SoundFile walk;
 
 void setup() {
   size(800, 640);
@@ -80,6 +88,14 @@ void setup() {
      carrotFloorGrowing[i] = spriteSheet.get(544+i*32, 64, wallSize, wallSize);
   }
   
+  for(int i = 0; i < 6; i++){
+     canabisFloorGrowing[i] = spriteSheet.get(544+i*32, 192, wallSize, wallSize);
+  }
+  
+  for(int i = 0; i < 6; i++){
+     plumFloorGrowing[i] = spriteSheet.get(544+i*32, 128, wallSize, wallSize);
+  }
+  
   for(int i = 0; i < 4; i++){
      npcStoreAnimate[i] = spriteSheet.get(i*32, 160, wallSize, wallSize);
   }
@@ -103,13 +119,45 @@ void setup() {
   
   registerMethod("keyPressed", this);
   initializeGameObjects();
+  
+
+  music = new SoundFile(this, "farmland_soundtrack.mp3");
+  walk = new SoundFile(this, "andando.mp3");
+
+  music.loop();
+  walk.loop();
+
 }
 
 void draw() {
   background(255); // Limpa a tela
 
-  updateCamera();
-  renderGame();
+  if (!gameWon) {
+    updateCamera();
+    renderGame();
+
+    if (player != null && player.isMoving() && !walk.isPlaying()) {
+      walk.loop();
+    } else if (player != null && !player.isMoving() && walk.isPlaying()) {
+      walk.stop();
+    }
+
+    // Verifica a condição de vitória
+    if (player != null && player.getMoney() >= 2000) {
+      gameWon = true;
+      music.stop();
+      walk.stop();
+    }
+  } else {
+    // Tela de vitória
+    fill(0, 0, 0, 150); // Fundo preto meio transparente
+    rect(0, 0, width, height);
+    
+    textSize(32);
+    fill(255); // Texto branco
+    textAlign(CENTER, CENTER);
+    text("Você ganhou o jogo!", width / 2, height / 2);
+  }
 }
 
 void initializeGameObjects() {
@@ -132,8 +180,6 @@ void initializeGameObjects() {
 }
 
 void renderGame() {
-  
-  
   // Desenha os pisos
   for (Floor floor : floors) {
     floor.display();
@@ -196,7 +242,6 @@ void renderGame() {
   
   shop.display(cameraX, cameraY);
   shop.checkMouseHover(mouseX, mouseY);
-  
 }
 
 void keyPressed() {
@@ -208,6 +253,16 @@ void keyPressed() {
     inventory.selectItem(0); // Seleciona o primeiro item (índice 0)
   } else if (key == '2') {
     inventory.selectItem(1); // Seleciona o segundo item (índice 1)
+  } else if (key == '3') {
+    inventory.selectItem(2); // Seleciona o segundo item (índice 1)
+  } else if (key == '4') {
+    inventory.selectItem(3); // Seleciona o segundo item (índice 1)
+  } else if (key == '5') {
+    inventory.selectItem(4); // Seleciona o segundo item (índice 1)
+  } else if (key == '6') {
+    inventory.selectItem(5); // Seleciona o segundo item (índice 1)
+  } else if (key == '7') {
+    inventory.selectItem(6); // Seleciona o segundo item (índice 1)
   } 
 }
 
@@ -231,8 +286,6 @@ void mouseReleased() {
         item.isClicked = false;
     }
 }
-
-
 
 void updateCamera() {
   if (player != null) {
@@ -306,7 +359,7 @@ void analyzeLayout() {
       }
       else if (pixelColor == plantyF) {
         floors.add(new Floor(x * wallSize * scale, y * wallSize * scale, wallSize * scale, wallSize * scale, floorImage));
-        plantyFloors.add(new PlantyFloor(x * wallSize * scale, y * wallSize * scale, wallSize * scale, wallSize * scale, plantyFloorDefault, plantyFloorGrowing, carrotFloorGrowing));
+        plantyFloors.add(new PlantyFloor(x * wallSize * scale, y * wallSize * scale, wallSize * scale, wallSize * scale, plantyFloorDefault, plantyFloorGrowing, carrotFloorGrowing,plumFloorGrowing,canabisFloorGrowing));
       }
       else if (pixelColor == pitColor) {
         floors.add(new Floor(x * wallSize * scale, y * wallSize * scale, wallSize * scale, wallSize * scale, floorImage));

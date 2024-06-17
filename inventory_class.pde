@@ -96,17 +96,17 @@ class Inventory {
                 fill(255); // Cor do texto
                 textAlign(RIGHT, TOP); // Alinhamento do texto
                 textSize(12); // Tamanho da fonte
-                text(quantity, startX + (i + 1) * slotSize - 5, startY + 5); // Posição do texto
+                text(quantity, startX + (i + 1) * slotSize-(slotSize/2) - 5, startY-(slotSize/2) + 5); // Posição do texto
                 popStyle(); // Restaura o estilo anterior
 
                 // Desenha um contorno branco ao redor do item selecionado
                 if (i == selectedSlot) {
                     noFill();
                     stroke(255);
-                    rect(startX + i * slotSize, startY, slotSize, slotSize);
+                    rect(startX + i, startY, slotSize, slotSize);
                 }
                 PImage itemImage = item.getImage(); // Obtém a imagem do item
-                image(itemImage, startX + i * slotSize, startY, slotSize, slotSize);
+                image(itemImage, startX + i * slotSize-(slotSize/2), startY-(slotSize/2), slotSize, slotSize);
             }
         }
     }

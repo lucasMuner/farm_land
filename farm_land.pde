@@ -154,13 +154,16 @@ void draw() {
     }
   } else {
     // Tela de vitória
+    rectMode(CORNER);
     fill(0, 0, 0, 150); // Fundo preto meio transparente
     rect(0, 0, width, height);
     
     textSize(32);
     fill(255); // Texto branco
+    PFont font8bit = createFont("8bitFont.TTF", 36);
+    textFont(font8bit);
     textAlign(CENTER, CENTER);
-    text("Você ganhou o jogo!", width / 2, height / 2);
+    text("Voce ganhou o jogo!", width / 2, height / 2);
   }
 }
 

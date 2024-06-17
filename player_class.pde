@@ -11,6 +11,13 @@ class Player extends CollidableObject {
     PImage plantySeedWetInteractyImage;
     PImage plantyCollect;
     PImage plantyCollectInteract;
+    PImage carrotImage;
+    PImage carrotSeedImage;
+    PImage carrotSeedInteractyImage;
+    PImage carrotSeedWetImage;
+    PImage carrotSeedWetInteractyImage;
+    PImage carrotCollect;
+    PImage carrotCollectInteract;
     PImage[] walkRightFrames;
     PImage[] walkLeftFrames;
     PImage[] walkDownFrames;
@@ -32,8 +39,12 @@ class Player extends CollidableObject {
     Inventory inventory;
     boolean playerIsCollidingWithPlanty = false;
     PlantyFloor collidingPlantyFloor = null;
+    boolean canInteractWithStore = true;
+    int dayFilterColor = color(255, 255, 255, 255); // Filtro de cor para o dia (sem efeito)
+    int nightFilterColor = color(30, 30, 30, 150); // Filtro de cor para a noite (escurecido)
+    int money;
     
-    Player(float x, float y, float size, float speed, PImage spriteSheet, PImage spriteAnimate, Inventory inventory) {
+    Player(float x, float y, float size, float speed, PImage spriteSheet, PImage spriteAnimate, Inventory inventory, int startingMoney) {
         super(new CollisionMask(0, 22, size - 15, size - 45, size, size));
         this.x = x;
         this.y = y;
@@ -42,6 +53,7 @@ class Player extends CollidableObject {
         this.img = spriteSheet;
         this.spriteAnimate = spriteAnimate;
         this.inventory = inventory;
+        this.money = startingMoney;
 
         // Carregar os frames da animação
         frameCount = 7;
@@ -61,6 +73,14 @@ class Player extends CollidableObject {
         plantySeedWetImage = spriteAnimate.get(256, 64, 32, 32);
         plantyCollect = spriteAnimate.get(384,64, 32, 32);
         plantyCollectInteract = spriteAnimate.get(288, 96, 32, 32);
+        
+        carrotImage = spriteAnimate.get(512, 32, 32, 32);
+        carrotSeedImage = spriteAnimate.get(512, 64, 32, 32);
+        carrotSeedInteractyImage = spriteAnimate.get(512, 96, 32, 32);
+        carrotSeedWetImage = spriteAnimate.get(544, 32, 32, 32);
+        carrotSeedWetInteractyImage = spriteAnimate.get(512, 96, 32, 32);
+        carrotCollect = spriteAnimate.get(672,64, 32, 32);
+        carrotCollectInteract = spriteAnimate.get(544, 96, 32, 32);
 
         for (int i = 0; i < frameCount; i++) {
             walkRightFrames[i] = spriteAnimate.get(i * 32, 64, 32, 32);
@@ -80,9 +100,14 @@ class Player extends CollidableObject {
         }
     }
 
-    void move(ArrayList<Wall> walls, ArrayList<Wall> wallsDown, ArrayList<Wall> wallsTopLeft, ArrayList<Wall> wallsTopRight, ArrayList<Wall> wallsDownLeft, ArrayList<Wall> wallsDownRight, ArrayList<PlantyFloor> planty, ArrayList<Pit> pits, ArrayList<Seed> seeds, ArrayList<Tomato> tomatos) {
-     float newX = x;
-    float newY = y;
+    void move(ArrayList<Wall> walls, ArrayList<Wall> wallsDown, ArrayList<Wall> wallsTopLeft, ArrayList<Wall> wallsTopRight, ArrayList<Wall> wallsDownLeft, ArrayList<Wall> wallsDownRight, ArrayList<PlantyFloor> planty, ArrayList<Pit> pits, ArrayList<Seed> seeds, ArrayList<Tomato> tomatos, ArrayList<NpcStore> npcWody) {
+     if (shop.isVisible) {
+            // Jogador não pode se mover enquanto a loja está aberta
+            return;
+        }
+      
+      float newX = x;
+     float newY = y;
 
     if (up) newY -= speed;
     if (down) newY += speed;
@@ -96,15 +121,25 @@ class Player extends CollidableObject {
         String plantyState = plantyFloor.getState();
         if (plantyState.equals("Vazio")) {
             plantyFloor.setDefaultSprite(plantyEmptyInteractyImage);
-            if(player.interact){
+           if(inventory.getSelectedItemName().equals("Semente de Tomate")){ 
+            if(player.interact && inventory.getItemQuantity("Semente de Tomate") > 0){
               plantyFloor.setDefaultSprite(plantySeedImage);
               plantyFloor.setState("Com Semente");
               inventory.removeItem("Semente de Tomate");
               this.interact = false;
             }
+            }else if(inventory.getSelectedItemName().equals("Semente de Cenoura")){
+                if(player.interact && inventory.getItemQuantity("Semente de Cenoura") > 0){
+              plantyFloor.setDefaultSprite(carrotSeedImage);
+              plantyFloor.setState("Com Semente de Cenoura");
+              inventory.removeItem("Semente de Cenoura");
+              this.interact = false;
+            }
+           }
         }else if(plantyState.equals("Com Semente")){
             plantyFloor.setDefaultSprite(plantySeedInteractyImage);
-            if(player.interact){
+            plantyFloor.setPlantyName("Tomate");
+            if(player.interact && inventory.getItemQuantity("Água") > 0){
                plantyFloor.setDefaultSprite(plantySeedWetImage);
                plantyFloor.setState("Com Semente e Molhado");
                inventory.removeItem("Água");
@@ -120,6 +155,26 @@ class Player extends CollidableObject {
                this.interact = false;
                plantyFloor.setState("Vazio");
                collectTomato();
+            }
+        }else if(plantyState.equals("Com Semente de Cenoura")){
+            plantyFloor.setDefaultSprite(carrotSeedInteractyImage);
+            plantyFloor.setPlantyName("Cenoura");
+            if(player.interact && inventory.getItemQuantity("Água") > 0){
+               plantyFloor.setDefaultSprite(carrotSeedWetImage);
+               plantyFloor.setState("Com Semente de Cenoura e Molhado");
+               inventory.removeItem("Água");
+               this.interact = false;
+            }
+        }else if(plantyState.equals("Com Semente de Cenoura e Molhado")){
+               plantyFloor.setIsGrowing(true);
+               this.interact = false;
+        }else if(plantyState.equals("Pronto Para Coletar Cenoura")){
+               plantyFloor.setDefaultSprite(carrotCollectInteract);
+            if(player.interact){
+               plantyFloor.setDefaultSprite(plantyEmptyImage);
+               this.interact = false;
+               plantyFloor.setState("Vazio");
+               collectCarrot();
             }
         }
         playerIsCollidingWithPlanty = plantyFloor.getIsColliding();
@@ -160,6 +215,12 @@ class Player extends CollidableObject {
          print("Colidiu com uma poço!");
     }
     
+    CollidableObject collidingObjectWody = getCollidingObject(npcWody);
+    if (collidingObjectWody != null) {
+        // Faça algo com o objeto colidido, por exemplo, imprimir uma mensagem
+         print("Colidiu com Wody!");
+    }
+    
     CollidableObject collidingObjectSeed = getCollidingObject(seeds);
     if (collidingObjectSeed != null) {
         collectSeed();
@@ -177,14 +238,42 @@ class Player extends CollidableObject {
             !collidesWithWalls(wallsTopRight) &&
             !collidesWithWalls(wallsDownLeft) &&
             !collidesWithWalls(wallsDownRight) &&
-            !collidesWithPit(pits)
+            !collidesWithPit(pits) &&
+            !collidesWithNpc(npcWody)
             ) {
             x = newX;
             y = newY;
         }
+        
+        
+         for (NpcStore npc : npcWody) {
+        if (npc.isPlayerNearby(this) && interact && canInteractWithStore) {
+             shop.show();
+             npc.setSprite(1);
+             canInteractWithStore = false;
+             lastInteractTime = millis();
+        }
+        
+        if (!canInteractWithStore && millis() - lastInteractTime >= 2000 && npc.getContnAnim()) {
+            canInteractWithStore = true;
+         }
+        }
+        
+         for (NpcStore npc : npcWody) {
+        if (npc.isPlayerNearby(this) && canInteractWithStore){
+              npc.setContnAnim(false);
+              npc.setSprite(3);
+              
+        }else{
+              npc.setContnAnim(true);
+        }
+          
+        }
+        
+        
          for (Pit pit : pits) {
         if (pit.isPlayerNearby(this) && canInteractWithPit){
-            
+              
               pit.setSprite(2);
         }else if(!pit.isPlayerNearby(this) && canInteractWithPit){
           pit.setSprite(1);
@@ -229,6 +318,14 @@ class Player extends CollidableObject {
         return false;
     }
     
+     boolean collidesWithNpc(ArrayList<NpcStore> npcs) {
+        for (NpcStore npc : npcs) {
+            if (getCollisionMask().collidesWith(npc.getCollisionMask())) {
+                return true;
+            }
+        }
+        return false;
+    }
     CollidableObject getCollidingObject(ArrayList<? extends CollidableObject> objects) {
     for (CollidableObject obj : objects) {
         if (obj != this && getCollisionMask().collidesWith(obj.getCollisionMask())) {
@@ -300,6 +397,12 @@ class Player extends CollidableObject {
         if (key == 'a') left = true;
         if (key == 'd') right = true;
         if (key == 'e') interact = true;
+        else if (key == ESC) {
+            if (shop.isVisible) {
+                shop.hide();
+                key = 0; // Previne que a tela de pause padrão apareça
+            }
+        }
     }
 
     void keyReleased() {
@@ -308,6 +411,11 @@ class Player extends CollidableObject {
         if (key == 'a') left = false;
         if (key == 'd') right = false;
         if (key == 'e') interact = false;
+    }
+        void mousePressed() {
+        if (shop.isVisible) {
+            shop.checkMouseClick(mouseX + cameraX, mouseY + cameraY);
+        }
     }
     
     int getQtdTomatoSeeds(){
@@ -320,21 +428,36 @@ class Player extends CollidableObject {
     }
     
     void collectSeed() {
-    InventoryItem seed = new InventoryItem("Semente de Tomate", 1, seedImage);
+    InventoryItem seed = new InventoryItem("Semente de Tomate", 1,0, seedImage);
     inventory.addItem(seed);
     }
     void collectWater() {
-    InventoryItem water = new InventoryItem("Água", 1, waterImage);
+    InventoryItem water = new InventoryItem("Água", 1,0, waterImage);
     inventory.addItem(water);
     }
      void collectTomato() {
-    InventoryItem tomato = new InventoryItem("Tomate", 1, tomatoImage);
+    InventoryItem tomato = new InventoryItem("Tomate", 1,200, tomatoImage);
     inventory.addItem(tomato);
+    }
+    void collectCarrot() {
+    InventoryItem carrot = new InventoryItem("Cenoura", 1, 400, carrotImage);
+    inventory.addItem(carrot);
     }
     
    void setInteract(boolean value){
        this.interact = value;
    }
+    void addMoney(int amount) {
+        this.money += amount;
+    }
+
+    void subtractMoney(int amount) {
+        this.money -= amount;
+    }
+
+    int getMoney() {
+        return money;
+    }
    
    
 }

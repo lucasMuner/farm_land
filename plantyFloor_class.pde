@@ -1,6 +1,7 @@
 class PlantyFloor extends CollidableObject{
   float x, y, w, h;
   PImage[] growthSprites;
+   PImage[] growthSpritesCarrot;
   PImage defaultSprite;
   PImage spriteSheet = loadImage("spritesheet.png");
   PImage defaultImageNotGrowing = spriteSheet.get(224, 32, 32, 32);
@@ -10,8 +11,9 @@ class PlantyFloor extends CollidableObject{
   boolean isGrowing = false;
   String state = "Vazio";
   boolean isColliding = false;
+  String plantyName = "Tomate";
 
-  PlantyFloor(float x, float y, float w, float h, PImage defaultSprite, PImage[] growthSprites) {
+  PlantyFloor(float x, float y, float w, float h, PImage defaultSprite, PImage[] growthSprites, PImage[] growthSpritesCarrot) {
      super(new CollisionMask(0, 0, 32, 32, 32, 32));
     this.x = x;
     this.y = y;
@@ -19,6 +21,7 @@ class PlantyFloor extends CollidableObject{
     this.h = h;
     this.defaultSprite = defaultSprite;
     this.growthSprites = growthSprites;
+    this.growthSpritesCarrot = growthSpritesCarrot;
     this.totalStages = growthSprites.length;
     this.currentStage = 0;
     this.lastUpdateTime = millis();
@@ -62,6 +65,17 @@ class PlantyFloor extends CollidableObject{
   boolean getIsGrowing(){
       return this.isGrowing;
   }
+  
+  void setPlantyName(String name){
+    this.plantyName = name;
+
+  }
+  
+  String getPlantyName(){
+    return this.plantyName;
+
+  }
+
 
   void update() {
     // Verifica se é hora de atualizar a sprite
@@ -77,12 +91,21 @@ class PlantyFloor extends CollidableObject{
   }
   
   void reset() {
+    if(this.plantyName.equals("Tomate")){
         this.currentStage = 0;
         this.state = "Pronto Para Coletar"; 
         this.isGrowing = false;
         if(state == "Pronto Para Coletar"){
           defaultSprite = defaultImageNotGrowing;
         }
+    }else if(this.plantyName.equals("Cenoura")){
+     this.currentStage = 0;
+        this.state = "Pronto Para Coletar Cenoura"; 
+        this.isGrowing = false;
+        if(state == "Pronto Para Coletar Cenoura"){
+          defaultSprite = defaultImageNotGrowing;
+        }
+    }
     }
 
   void display() {
@@ -91,10 +114,18 @@ class PlantyFloor extends CollidableObject{
     // Desenhar a máscara de colisão
         getCollisionMask().display();
     // Exibe a sprite correspondente ao estágio atual de crescimento ou a sprite padrão se não estiver crescendo
+    if(this.plantyName.equals("Tomate")){
     if (isGrowing) {
       image(growthSprites[currentStage], x, y, w, h);
     } else {
       image(defaultSprite, x, y, w, h);
     }
+  }else if(this.plantyName.equals("Cenoura")){
+  if (isGrowing) {
+      image(growthSpritesCarrot[currentStage], x, y, w, h);
+    } else {
+      image(defaultSprite, x, y, w, h);
+    }
+  }
   }
 }

@@ -1,6 +1,6 @@
 Player player;
 Inventory inventory;
-
+Shop shop;
 PImage spriteSheet;
 PImage wallImage;
 PImage wallDownImage;
@@ -11,20 +11,28 @@ PImage wallDownRightImage;
 PImage plantyFloorDefault;
 PImage seedImage;
 PImage pitImage;
+PImage shopBackground;
+PImage moneyIcon;
 PImage[] plantyFloorGrowing = new PImage[6];
+PImage[] carrotFloorGrowing = new PImage[6];
 PImage[] pitsAnimate = new PImage[3];
+PImage[] npcStoreImages = new PImage[2];
+PImage[] npcStoreAnimate= new PImage[4];
 PImage playerImage;
 PImage layoutImage;
 PImage floorImage;
 int wallSize = 32; 
 int scale = 2;
 int playerSize = 32;
-int speed = 10;
+int speed = 5;
 int scaleLayout = 40; // Escala do layout
 int rows = 16; // Número de linhas no layoutds
 int cols = 20; 
 float cameraX, cameraY;
+PImage buttonBackground;
+int horas = 20;
 
+ArrayList<NpcStore> npcWody;
 ArrayList<Wall> walls;
 ArrayList<Wall> wallsDown;
 ArrayList<Wall> wallsTopLeft;
@@ -37,6 +45,7 @@ ArrayList<Pit> pits;
 ArrayList<Seed> seeds;
 ArrayList<Tomato> tomatos;
 
+
 void setup() {
   size(800, 640);
   inventory = new Inventory();
@@ -44,7 +53,8 @@ void setup() {
   spriteSheet = loadImage("spritesheet.png");
   layoutImage = loadImage("layout.png");
   layoutImage.resize(cols, rows); // Redimensiona a imagem para o tamanho desejado
-  
+  shopBackground = loadImage("shop_background.png");
+  buttonBackground = loadImage("item_shop_background.png");
   wallImage = spriteSheet.get(0, 32, wallSize, wallSize);
   wallDownImage = spriteSheet.get(64, 32, wallSize, wallSize);
   wallTopLeftImage = spriteSheet.get(96, 32, wallSize, wallSize);
@@ -53,19 +63,45 @@ void setup() {
   wallDownRightImage = spriteSheet.get(192, 32, wallSize, wallSize);
   plantyFloorDefault = spriteSheet.get(224, 32, wallSize, wallSize);
   playerImage = spriteSheet.get(0, 0, playerSize-1, playerSize-1);
+  npcStoreImages[0] = spriteSheet.get(0, 160, wallSize, wallSize);
+  npcStoreImages[1] = spriteSheet.get(0, 192, wallSize, wallSize);
   floorImage = spriteSheet.get(32, 32, wallSize, wallSize);
   pitImage = spriteSheet.get(384,32,wallSize,wallSize);
   pitsAnimate[0] = spriteSheet.get(448,32,wallSize,wallSize);
   pitsAnimate[1] = spriteSheet.get(384,32,wallSize,wallSize);
   pitsAnimate[2] = spriteSheet.get(480,32,wallSize,wallSize);
   seedImage = spriteSheet.get(416,32,wallSize,wallSize);
+  moneyIcon = spriteSheet.get(0,224,wallSize,wallSize);
   for(int i = 0; i < 6; i++){
      plantyFloorGrowing[i] = spriteSheet.get(256+i*32, 64, wallSize, wallSize);
   }
+  
+  for(int i = 0; i < 6; i++){
+     carrotFloorGrowing[i] = spriteSheet.get(544+i*32, 64, wallSize, wallSize);
+  }
+  
+  for(int i = 0; i < 4; i++){
+     npcStoreAnimate[i] = spriteSheet.get(i*32, 160, wallSize, wallSize);
+  }
+  PImage hoverImage = loadImage("item_shop_background_over.png");
+    PImage clickedImage = loadImage("item_shop_background_click.png");
+  
+    shop = new Shop(inventory, player, moneyIcon,buttonBackground);
+    PImage itemImage1 = spriteSheet.get(480,0,wallSize,wallSize);
+    PImage itemImage2 = spriteSheet.get(544,0,wallSize,wallSize);
+    PImage itemImage3 = spriteSheet.get(576,0,wallSize,wallSize);
+    PImage itemImage4 = spriteSheet.get(608,0,wallSize,wallSize);
+    
+   
+
+    shop.addItem(new ShopItem("Semente de Tomate", 100,itemImage1,hoverImage,clickedImage));
+    shop.addItem(new ShopItem("Semente de Cenoura", 200,itemImage2,hoverImage,clickedImage));
+    shop.addItem(new ShopItem("Semente de Ameixa", 300,itemImage3,hoverImage,clickedImage));
+    shop.addItem(new ShopItem( "Semente de Canabis", 400,itemImage4,hoverImage,clickedImage));
+ 
  
   
   registerMethod("keyPressed", this);
-  registerMethod("keyReleased", this);
   initializeGameObjects();
 }
 
@@ -89,12 +125,15 @@ void initializeGameObjects() {
   pits = new ArrayList<Pit>();
   seeds = new ArrayList<Seed>();
   tomatos = new ArrayList<Tomato>();
+  npcWody = new ArrayList<NpcStore>();
 
   // Analisando o layout para determinar as paredes e o chão
   analyzeLayout();
 }
 
 void renderGame() {
+  
+  
   // Desenha os pisos
   for (Floor floor : floors) {
     floor.display();
@@ -131,6 +170,9 @@ void renderGame() {
     wall.display();
   }
   
+  for (NpcStore npc : npcWody) {
+   npc.display();
+  }
     // Chame a função display() do player
   if (player != null) {
     player.move(walls, 
@@ -142,11 +184,19 @@ void renderGame() {
           plantyFloors,
           pits,
           seeds,
-          tomatos);
+          tomatos,
+          npcWody);
     player.display();
   }
   
+  if (npcWody != null){
+  
+  }
   inventory.display();
+  
+  shop.display(cameraX, cameraY);
+  shop.checkMouseHover(mouseX, mouseY);
+  
 }
 
 void keyPressed() {
@@ -154,6 +204,11 @@ void keyPressed() {
   if (player != null) {
     player.keyPressed();
   }
+  if (key == '1') {
+    inventory.selectItem(0); // Seleciona o primeiro item (índice 0)
+  } else if (key == '2') {
+    inventory.selectItem(1); // Seleciona o segundo item (índice 1)
+  } 
 }
 
 void keyReleased() {
@@ -162,6 +217,22 @@ void keyReleased() {
     player.keyReleased();
   }
 }
+
+void mousePressed() {
+  // Chame a função keyReleased() do player
+  if (player != null) {
+    player.mousePressed();
+  }
+}
+
+void mouseReleased() {
+  // Chame a função keyReleased() do player
+    for (ShopItem item : shop.items) {
+        item.isClicked = false;
+    }
+}
+
+
 
 void updateCamera() {
   if (player != null) {
@@ -184,6 +255,9 @@ void updateCamera() {
   
   // Aplica a translação da câmera
   translate(-cameraX, -cameraY);
+  if (shop.isVisible) {
+    shop.display(cameraX, cameraY);
+  }
 }
 
 void analyzeLayout() {
@@ -201,6 +275,7 @@ void analyzeLayout() {
   int plantyF = color(127,89,63);
   int pitColor = color(255,216,0);
   int seedColor = color(0,255,255);
+  int npcStoreColor = color(178,0,255);
 
   // Percorre os pixels da imagem do layout
   for (int y = 0; y < rows; y++) {
@@ -231,11 +306,15 @@ void analyzeLayout() {
       }
       else if (pixelColor == plantyF) {
         floors.add(new Floor(x * wallSize * scale, y * wallSize * scale, wallSize * scale, wallSize * scale, floorImage));
-        plantyFloors.add(new PlantyFloor(x * wallSize * scale, y * wallSize * scale, wallSize * scale, wallSize * scale, plantyFloorDefault, plantyFloorGrowing));
+        plantyFloors.add(new PlantyFloor(x * wallSize * scale, y * wallSize * scale, wallSize * scale, wallSize * scale, plantyFloorDefault, plantyFloorGrowing, carrotFloorGrowing));
       }
       else if (pixelColor == pitColor) {
         floors.add(new Floor(x * wallSize * scale, y * wallSize * scale, wallSize * scale, wallSize * scale, floorImage));
         pits.add(new Pit(x * wallSize * scale, y * wallSize * scale, wallSize * scale, wallSize * scale,0,6,wallSize * scale,(wallSize-12) * scale, pitImage, pitsAnimate));
+      }
+      else if (pixelColor == npcStoreColor) {
+        floors.add(new Floor(x * wallSize * scale, y * wallSize * scale, wallSize * scale, wallSize * scale, floorImage));
+        npcWody.add(new NpcStore(x * wallSize * scale, y * wallSize * scale, playerSize * scale, playerSize * scale,0,6,(wallSize-10) * scale,(wallSize-6) * scale, npcStoreAnimate));
       }
       else if (pixelColor == seedColor) {
         floors.add(new Floor(x * wallSize * scale, y * wallSize * scale, wallSize * scale, wallSize * scale, floorImage));
@@ -245,7 +324,8 @@ void analyzeLayout() {
         floors.add(new Floor(x * wallSize * scale, y * wallSize * scale, wallSize * scale, wallSize * scale, floorImage));
       } else if (pixelColor == playerColor) {
         floors.add(new Floor(x * wallSize * scale, y * wallSize * scale, wallSize * scale, wallSize * scale, floorImage));
-        player = new Player(x * wallSize * scale, y * wallSize * scale, playerSize * scale, speed, playerImage, spriteSheet,inventory);
+        player = new Player(x * wallSize * scale, y * wallSize * scale, playerSize * scale, speed, playerImage, spriteSheet,inventory, 200);
+        shop.setPlayer(player);
       }
     }
   }

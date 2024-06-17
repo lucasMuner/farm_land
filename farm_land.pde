@@ -3,6 +3,8 @@ import processing.sound.*;
 Player player;
 Inventory inventory;
 Shop shop;
+MainMenu menu;
+boolean gameStarted = false;
 boolean gameWon = false;
 boolean isMoving = false;
 PImage spriteSheet;
@@ -31,7 +33,7 @@ int wallSize = 32;
 int scale = 2;
 int playerSize = 32;
 int speed = 3;
-int scaleLayout = 40; // Escala do layout
+int scaleLayout = 40; // Escala do layoutsd
 int rows = 16; // Número de linhas no layout
 int cols = 20; 
 float cameraX, cameraY;
@@ -57,7 +59,7 @@ SoundFile walk;
 void setup() {
   size(800, 640);
   inventory = new Inventory();
-
+  menu = new MainMenu();
   spriteSheet = loadImage("spritesheet.png");
   layoutImage = loadImage("layout.png");
   layoutImage.resize(cols, rows); // Redimensiona a imagem para o tamanho desejado
@@ -100,27 +102,22 @@ void setup() {
      npcStoreAnimate[i] = spriteSheet.get(i*32, 160, wallSize, wallSize);
   }
   PImage hoverImage = loadImage("item_shop_background_over.png");
-    PImage clickedImage = loadImage("item_shop_background_click.png");
-  
-    shop = new Shop(inventory, player, moneyIcon,buttonBackground);
-    PImage itemImage1 = spriteSheet.get(480,0,wallSize,wallSize);
-    PImage itemImage2 = spriteSheet.get(544,0,wallSize,wallSize);
-    PImage itemImage3 = spriteSheet.get(576,0,wallSize,wallSize);
-    PImage itemImage4 = spriteSheet.get(608,0,wallSize,wallSize);
-    
-   
+  PImage clickedImage = loadImage("item_shop_background_click.png");
 
-    shop.addItem(new ShopItem("Semente de Tomate", 100,itemImage1,hoverImage,clickedImage));
-    shop.addItem(new ShopItem("Semente de Cenoura", 200,itemImage2,hoverImage,clickedImage));
-    shop.addItem(new ShopItem("Semente de Ameixa", 300,itemImage3,hoverImage,clickedImage));
-    shop.addItem(new ShopItem( "Semente de Canabis", 400,itemImage4,hoverImage,clickedImage));
- 
- 
+  shop = new Shop(inventory, player, moneyIcon,buttonBackground);
+  PImage itemImage1 = spriteSheet.get(480,0,wallSize,wallSize);
+  PImage itemImage2 = spriteSheet.get(544,0,wallSize,wallSize);
+  PImage itemImage3 = spriteSheet.get(576,0,wallSize,wallSize);
+  PImage itemImage4 = spriteSheet.get(608,0,wallSize,wallSize);
+
+  shop.addItem(new ShopItem("Semente de Tomate", 100,itemImage1,hoverImage,clickedImage));
+  shop.addItem(new ShopItem("Semente de Cenoura", 200,itemImage2,hoverImage,clickedImage));
+  shop.addItem(new ShopItem("Semente de Ameixa", 300,itemImage3,hoverImage,clickedImage));
+  shop.addItem(new ShopItem( "Semente de Canabis", 400,itemImage4,hoverImage,clickedImage));
   
   registerMethod("keyPressed", this);
   initializeGameObjects();
   
-
   music = new SoundFile(this, "farmland_soundtrack.mp3");
   walk = new SoundFile(this, "andando.mp3");
 
@@ -131,8 +128,11 @@ void setup() {
 
 void draw() {
   background(255); // Limpa a tela
-
-  if (!gameWon) {
+  if(!gameStarted)
+  {
+    menu.display();
+    gameStarted = menu.gameStarted;
+  } else if (!gameWon) {
     updateCamera();
     renderGame();
 
@@ -275,9 +275,13 @@ void keyReleased() {
 
 void mousePressed() {
   // Chame a função keyReleased() do player
-  if (player != null) {
+  if(!gameStarted) {
+    menu.mousePressed();
+    
+  } else if (player != null) {
     player.mousePressed();
   }
+  
 }
 
 void mouseReleased() {

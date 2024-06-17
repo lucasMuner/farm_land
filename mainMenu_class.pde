@@ -32,13 +32,7 @@ class MainMenu {
     background(bg);
     image(farmLandLogo, width / 2 - farmLandLogo.width / 2, 50);
     if (selectedItem == -1) {
-      fill(0);
-      textSize(48);
-      // Sombreamento
-      text(title, width / 2 + 2, height / 4 + 2);
-      fill(139, 69, 19);  // Cor marrom clarinho
-      text(title, width / 2, height / 4);  // Desenhar o título
-  
+      
       textSize(36);
       for (int i = 0; i < menuItems.length; i++) {
         float x = width / 2;

@@ -490,11 +490,11 @@ class Player extends CollidableObject {
     }
 
 void keyPressed() {
-    if (key == 'w') up = true;
-    if (key == 's') down = true;
-    if (key == 'a') left = true;
-    if (key == 'd') right = true;
-    if (key == 'e') interact = true;
+    if (key == 'w' || key == 'W') up = true;
+    if (key == 's' || key == 'S') down = true;
+    if (key == 'a' || key == 'A') left = true;
+    if (key == 'd' || key == 'D') right = true;
+    if (key == 'e' || key == 'E') interact = true;
     else if (key == ESC) {
         if (shop.isVisible) {
             shop.hide();
@@ -506,11 +506,11 @@ void keyPressed() {
 }
 
 void keyReleased() {
-    if (key == 'w') up = false;
-    if (key == 's') down = false;
-    if (key == 'a') left = false;
-    if (key == 'd') right = false;
-    if (key == 'e') interact = false;
+    if (key == 'w' || key == 'W') up = false;
+    if (key == 's' || key == 'S') down = false;
+    if (key == 'a' || key == 'A') left = false;
+    if (key == 'd' || key == 'D') right = false;
+    if (key == 'e' || key == 'E') interact = false;
 
     checkMoving();
 }

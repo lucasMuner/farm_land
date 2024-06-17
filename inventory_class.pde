@@ -103,7 +103,7 @@ class Inventory {
                 if (i == selectedSlot) {
                     noFill();
                     stroke(255);
-                    rect(startX + i, startY, slotSize, slotSize);
+                    rect(startX + i*slotSize, startY, slotSize, slotSize);
                 }
                 PImage itemImage = item.getImage(); // Obtém a imagem do item
                 image(itemImage, startX + i * slotSize-(slotSize/2), startY-(slotSize/2), slotSize, slotSize);

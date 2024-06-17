@@ -14,6 +14,7 @@ class PlantyFloor extends CollidableObject{
   String state = "Vazio";
   boolean isColliding = false;
   String plantyName = "Tomate";
+  int timeGrowing = 1000;
 
   PlantyFloor(float x, float y, float w, float h, PImage defaultSprite, PImage[] growthSprites, PImage[] growthSpritesCarrot,PImage[] growthSpritesPlum,PImage[] growthSpritesCanabis) {
      super(new CollisionMask(0, 0, 32, 32, 32, 32));
@@ -79,18 +80,59 @@ class PlantyFloor extends CollidableObject{
     return this.plantyName;
 
   }
-
+  
+  int verifyTimeGrowing(){
+    
+    if(player.difficulty == 0){
+      return timeGrowing;
+    }else if(player.difficulty == 1){
+      return 2*timeGrowing;
+    }else{
+      return 3*timeGrowing;
+    }    
+  }
 
   void update() {
-    // Verifica se é hora de atualizar a sprite
+    if(this.plantyName.equals("Tomate")){
     int elapsedTime = millis() - lastUpdateTime;
-    if (elapsedTime > 1000 && isGrowing) { // 60000 milissegundos = 1 minuto
+    if (elapsedTime > verifyTimeGrowing() && isGrowing) { // 60000 milissegundos = 1 minuto
       currentStage++;
       if (currentStage >= totalStages-1) {
         currentStage = totalStages - 1; // Garante que não ultrapasse o número total de estágios
         reset();
       }
       lastUpdateTime = millis();
+    }
+    }else if(this.plantyName.equals("Cenoura")){
+    int elapsedTime = millis() - lastUpdateTime;
+    if (elapsedTime > verifyTimeGrowing()*2 && isGrowing) { // 60000 milissegundos = 1 minuto
+      currentStage++;
+      if (currentStage >= totalStages-1) {
+        currentStage = totalStages - 1; // Garante que não ultrapasse o número total de estágios
+        reset();
+      }
+      lastUpdateTime = millis();
+    }
+    }else if(this.plantyName.equals("Ameixa")){
+    int elapsedTime = millis() - lastUpdateTime;
+    if (elapsedTime > verifyTimeGrowing()*3 && isGrowing) { // 60000 milissegundos = 1 minuto
+      currentStage++;
+      if (currentStage >= totalStages-1) {
+        currentStage = totalStages - 1; // Garante que não ultrapasse o número total de estágios
+        reset();
+      }
+      lastUpdateTime = millis();
+    }
+    }else if(this.plantyName.equals("Canabis")){
+    int elapsedTime = millis() - lastUpdateTime;
+    if (elapsedTime > verifyTimeGrowing()*4 && isGrowing) { // 60000 milissegundos = 1 minuto
+      currentStage++;
+      if (currentStage >= totalStages-1) {
+        currentStage = totalStages - 1; // Garante que não ultrapasse o número total de estágios
+        reset();
+      }
+      lastUpdateTime = millis();
+    }
     }
   }
   

@@ -1,6 +1,6 @@
 class MainMenu {
   PImage bg;
-  PImage easyImage, mediumImage, hardImage;
+  PImage easyImage, mediumImage, hardImage, farmLandLogo;
   String title = "Farm Land";
   String[] menuItems = {"Play", "Instructions", "Credits"};
   float[] angles = {0, 0, 0};  // Ângulos para o efeito de gangorra
@@ -12,7 +12,7 @@ class MainMenu {
   String difficultyText;
 
   MainMenu() {
-      
+      farmLandLogo = loadImage("farm land logo.png");
       bg = loadImage("background.jpg");
       bg.resize(width, height);
       easyImage = loadImage("easy.png");
@@ -21,6 +21,7 @@ class MainMenu {
       easyImage.resize(200, 200);  // Ajustar a escala das imagens
       mediumImage.resize(200, 200);
       hardImage.resize(200, 200);
+      farmLandLogo.resize(400, 200);
       font8bit = createFont("8bitFont.TTF", 36);
       textFont(font8bit);
       textAlign(CENTER, CENTER);
@@ -29,6 +30,7 @@ class MainMenu {
 
   void display() {
     background(bg);
+    image(farmLandLogo, width / 2 - farmLandLogo.width / 2, 50);
     if (selectedItem == -1) {
       fill(0);
       textSize(48);

@@ -5,7 +5,8 @@ class Shop {
     Player player;
     PImage moneyIcon;
     PImage sellButtonImage; // Imagem do botão de vender
-
+    PFont arial;
+    
     Shop(Inventory inventory, Player player, PImage moneyIcon, PImage sellButtonImage) {
         items = new ArrayList<>();
         isVisible = false;
@@ -21,7 +22,10 @@ class Shop {
 
     void display(float cameraX, float cameraY) {
     if (!isVisible) return;
-
+    
+    arial = createFont("Arial", 12);
+    textFont(arial);
+     
     float shopX = cameraX + width / 2 - (width - 100) / 2;
     float shopY = cameraY + height / 2 - (height - 100) / 2;
 

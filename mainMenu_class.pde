@@ -157,16 +157,16 @@ class MainMenu {
       if (mouseX > width / 2 - 120 && mouseX < width / 2 + 120 && mouseY > height - 75 && mouseY < height - 25) {
         selectedItem = -1;
          player.setDifficulty(0);
-         player.setMoney(50);
+         player.setMoney(200);
       } else if (selectedItem == 0) {  // Play
         if (mouseX > width / 2 - 220 && mouseX < width / 2 - 180 && mouseY > height / 2 - 20 && mouseY < height / 2 + 20) {
           difficulty = max(0, difficulty - 1);  // Decrease difficulty
-        player.setDifficulty(0);
-        player.setMoney(200);
+        player.setDifficulty(1);
+        player.setMoney(100);
         } else if (mouseX > width / 2 + 180 && mouseX < width / 2 + 220 && mouseY > height / 2 - 20 && mouseY < height / 2 + 20) {
           difficulty = min(2, difficulty + 1);  // Increase difficulty
-          player.setDifficulty(0);
-        player.setMoney(100);
+          player.setDifficulty(2);
+        player.setMoney(50);
         } else if (mouseX > width / 2 - 120 && mouseX < width / 2 + 120 && mouseY > height - 175 && mouseY < height - 125) {
 
           gameStarted = true;

@@ -115,13 +115,6 @@ class Player extends CollidableObject {
         canabisCollect = spriteAnimate.get(672,192, 32, 32);
         canabisCollectInteract = spriteAnimate.get(544, 224, 32, 32);
 
-        for (int i = 0; i < frameCount; i++) {
-            walkRightFrames[i] = spriteAnimate.get(i * 32, 64, 32, 32);
-            walkLeftFrames[i] = spriteAnimate.get(i * 32, 96, 32, 32);
-            walkDownFrames[i] = spriteAnimate.get(i * 32, 0, 32, 32);
-            walkUpFrames[i] = spriteAnimate.get(i * 32 + 224, 0, 32, 32);
-        }
-
         currentFrame = 0;
         lastFrameTime = 0;
     }
@@ -438,8 +431,31 @@ class Player extends CollidableObject {
 
     void display() {
         updateAnimation();
+        
+        for (int i = 0; i < frameCount; i++) {
+          if(difficulty == 0){
+            walkRightFrames[i] = spriteAnimate.get(i * 32, 64, 32, 32);
+            walkLeftFrames[i] = spriteAnimate.get(i * 32, 96, 32, 32);
+            walkDownFrames[i] = spriteAnimate.get(i * 32, 0, 32, 32);
+            walkUpFrames[i] = spriteAnimate.get(i * 32 + 224, 0, 32, 32);
+          }else if(difficulty == 1){
+            walkRightFrames[i] = spriteAnimate.get(i * 32, 288, 32, 32);
+            walkLeftFrames[i] = spriteAnimate.get(i * 32, 320, 32, 32);
+            walkDownFrames[i] = spriteAnimate.get(i * 32, 256, 32, 32);
+            walkUpFrames[i] = spriteAnimate.get(i * 32 + 224, 256, 32, 32);
+          }else if(difficulty == 2){
+            walkRightFrames[i] = spriteAnimate.get(i * 32, 384, 32, 32);
+            walkLeftFrames[i] = spriteAnimate.get(i * 32, 416, 32, 32);
+            walkDownFrames[i] = spriteAnimate.get(i * 32, 352, 32, 32);
+            walkUpFrames[i] = spriteAnimate.get(i * 32 + 224, 352, 32, 32);
+          }
+        }
+        
+        if(difficulty == 0) img = spriteAnimate.get(0, 0, 32, 32);
+        if(difficulty == 1) img = spriteAnimate.get(32, 256, 32, 32);
+        if(difficulty == 2) img = spriteAnimate.get(64, 352, 32, 32);
         PImage currentImage = null; // Inicializa como nulo
-
+  
         // Define a imagem atual com base na direção do movimento
         if (right) {
             currentImage = walkRightFrames[currentFrame];
@@ -589,6 +605,11 @@ void checkMoving() {
    void setMoney(int newMoney){
      
      this.money = newMoney;
+   }
+   
+   void setSpriteShit(PImage spriteShit){
+     
+     this.img = spriteShit;
    }
    
    void setDifficulty(int newDiff){
